@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Testing.Xunit</PackageId>
+    <Description>xUnit assertion helpers for RetriEval — gate retrieval quality in CI with one method call.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <ProjectReference Include="..\RetriEval.Reporting\RetriEval.Reporting.csproj" />
+    <!-- xunit is a test-only dep; consumers bring their own xunit version -->
+    <PackageReference Include="xunit.assert" Version="2.5.3" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Reporting</PackageId>
+    <Description>JSON, HTML reporters and regression comparison for RetriEval evaluation runs.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+  </ItemGroup>
+
+</Project>

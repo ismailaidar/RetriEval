@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2024 RetriEval Contributors")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+653027e0d2baf331d86d829675f793a7bff74527")]
 [assembly: System.Reflection.AssemblyProductAttribute("RetriEval")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RetriEval.Sample")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.0.0")]

@@ -1,6 +1,6 @@
 ﻿# RetriEval Report
 
-**Run at:** 2026-06-06 21:29:55Z  
+**Run at:** 2026-06-06 23:25:32Z  
 **Retriever:** `InMemoryRetriever`  
 **Grader:** `ChunkIdGrader`  
 **k:** 3  

@@ -1,5 +1,15 @@
 <Solution>
+  <!-- Core -->
   <Project Path="src/RetriEval.Core/RetriEval.Core.csproj" />
+
+  <!-- M2: Reporting + Test wrappers -->
+  <Project Path="src/RetriEval.Reporting/RetriEval.Reporting.csproj" />
+  <Project Path="src/RetriEval.Testing.Xunit/RetriEval.Testing.Xunit.csproj" />
+  <Project Path="src/RetriEval.Testing.NUnit/RetriEval.Testing.NUnit.csproj" />
+
+  <!-- Tests -->
   <Project Path="tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj" />
+  <Project Path="tests/RetriEval.Reporting.Tests/RetriEval.Reporting.Tests.csproj" />
+  <!-- Sample -->
   <Project Path="samples/RetriEval.Sample/RetriEval.Sample.csproj" />
 </Solution>

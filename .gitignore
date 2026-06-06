@@ -1,0 +1,18 @@
+## .NET / MSBuild
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Packages & artifacts
+artifacts/
+*.nupkg
+*.snupkg
+
+## Generated reports (produced at runtime)
+retrieval-report.md
+
+## OS junk
+.DS_Store
+Thumbs.db

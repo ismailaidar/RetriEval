@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Testing.NUnit</PackageId>
+    <Description>NUnit assertion helpers for RetriEval — gate retrieval quality in CI with one method call.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <ProjectReference Include="..\RetriEval.Reporting\RetriEval.Reporting.csproj" />
+    <PackageReference Include="NUnit" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>
