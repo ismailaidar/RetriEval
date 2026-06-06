@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "zVX2yIIheO4=",
+  "success": true,
+  "projectFilePath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/ismailaidar/.nuget/packages/microsoft.build.tasks.git/8.0.0/microsoft.build.tasks.git.8.0.0.nupkg.sha512",
+    "/Users/ismailaidar/.nuget/packages/microsoft.sourcelink.common/8.0.0/microsoft.sourcelink.common.8.0.0.nupkg.sha512",
+    "/Users/ismailaidar/.nuget/packages/microsoft.sourcelink.github/8.0.0/microsoft.sourcelink.github.8.0.0.nupkg.sha512",
+    "/Users/ismailaidar/.nuget/packages/microsoft.netcore.app.ref/8.0.26/microsoft.netcore.app.ref.8.0.26.nupkg.sha512",
+    "/Users/ismailaidar/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.26/microsoft.aspnetcore.app.ref.8.0.26.nupkg.sha512"
+  ],
+  "logs": []
+}

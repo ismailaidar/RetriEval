@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RetriEval.Core</name>
+    </assembly>
+    <members>
+        <member name="T:RetriEval.Core.AggregateMetrics">
+            <summary>
+            Aggregate (mean) metric values across all non-errored golden cases in a run.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.HitAtK">
+            <summary>Mean Hit@k (proportion of queries that had at least one relevant result in top-k).</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.MeanPrecisionAtK">
+            <summary>Mean Precision@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.MeanRecallAtK">
+            <summary>Mean Recall@k (known-item recall; see caveat in <see cref="M:RetriEval.Core.RetrievalMetrics.RecallAtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32,System.Int32)"/>).</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.Mrr">
+            <summary>Mean Reciprocal Rank.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.Map">
+            <summary>Mean Average Precision.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.MeanNdcgAtK">
+            <summary>Mean NDCG@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.MeanF1AtK">
+            <summary>Mean F1@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.K">
+            <summary>The k value these aggregates were computed at.</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.EvaluatedCaseCount">
+            <summary>Number of cases included in the aggregate (excludes errored cases).</summary>
+        </member>
+        <member name="P:RetriEval.Core.AggregateMetrics.ErroredCaseCount">
+            <summary>Number of errored cases (excluded from aggregates).</summary>
+        </member>
+        <member name="T:RetriEval.Core.EvalOptions">
+            <summary>
+            Configuration options for <see cref="T:RetriEval.Core.EvalRunner"/>.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalOptions.K">
+            <summary>Default number of results to retrieve per query.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalOptions.MaxConcurrency">
+            <summary>Maximum number of golden cases evaluated concurrently.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalOptions.MaxRetries">
+            <summary>
+            Number of times to retry a retriever call on transient failure before recording an error.
+            Set to 0 to disable retries.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalOptions.RetryBaseDelay">
+            <summary>
+            Base delay for exponential backoff between retries.
+            Effective delay for attempt n = <see cref="P:RetriEval.Core.EvalOptions.RetryBaseDelay"/> * 2^n.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalOptions.Observer">
+            <summary>
+            Observer that receives lifecycle events during the run.
+            Defaults to <see cref="T:RetriEval.Core.NullEvalObserver"/> when <see langword="null"/>.
+            </summary>
+        </member>
+        <member name="T:RetriEval.Core.EvalReport">
+            <summary>
+            The full output of an evaluation run: aggregate metrics, per-query results, and run metadata.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.RunAt">
+            <summary>UTC timestamp when the run started.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.Aggregate">
+            <summary>Aggregate (mean) metrics across all non-errored cases.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.Results">
+            <summary>Per-query results in the order the golden cases were supplied.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.Options">
+            <summary>Options the run was configured with.</summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.RetrieverName">
+            <summary>
+            Name of the retriever, used in reports and diffs.
+            Derived from <see cref="T:RetriEval.Core.IRetriever"/> type name by default.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.GraderName">
+            <summary>
+            Name of the grader, used in reports and diffs.
+            Derived from <see cref="T:RetriEval.Core.IGrader"/> type name by default.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.EvalReport.ErroredResults">
+            <summary>Convenience: results where <see cref="P:RetriEval.Core.QueryResult.Error"/> is non-null.</summary>
+        </member>
+        <member name="T:RetriEval.Core.EvalRunner">
+            <summary>
+            Orchestrates an evaluation run: retrieves results for each golden case concurrently,
+            grades them, computes per-query and aggregate metrics, and returns an <see cref="T:RetriEval.Core.EvalReport"/>.
+            </summary>
+        </member>
+        <member name="M:RetriEval.Core.EvalRunner.#ctor(RetriEval.Core.IRetriever,RetriEval.Core.IGrader,RetriEval.Core.EvalOptions)">
+            <param name="retriever">The system under test.</param>
+            <param name="grader">Relevance judge applied to each retrieved chunk.</param>
+            <param name="options">Run configuration. Defaults are applied when <see langword="null"/>.</param>
+        </member>
+        <member name="M:RetriEval.Core.EvalRunner.RunAsync(System.Collections.Generic.IEnumerable{RetriEval.Core.GoldenCase},System.Threading.CancellationToken)">
+            <summary>
+            Evaluates every case in <paramref name="goldenSet"/> and returns the aggregate report.
+            Cases run concurrently up to <see cref="P:RetriEval.Core.EvalOptions.MaxConcurrency"/>.
+            Retriever failures are captured per-case and do not abort the run.
+            </summary>
+            <param name="goldenSet">The labeled evaluation cases to run.</param>
+            <param name="ct">Cancellation token. Cancelling stops new cases from starting.</param>
+        </member>
+        <member name="T:RetriEval.Core.IEvalObserver">
+            <summary>
+            Receives lifecycle events from <see cref="T:RetriEval.Core.EvalRunner"/>.
+            Use to show progress, pipe to telemetry, or log intermediate results.
+            Implementations must be thread-safe: events may fire from concurrent tasks.
+            </summary>
+        </member>
+        <member name="M:RetriEval.Core.IEvalObserver.OnCaseStarted(RetriEval.Core.GoldenCase)">
+            <summary>Called when a case is about to be evaluated.</summary>
+        </member>
+        <member name="M:RetriEval.Core.IEvalObserver.OnCaseCompleted(RetriEval.Core.QueryResult)">
+            <summary>Called when a case has finished (successfully or with an error).</summary>
+        </member>
+        <member name="M:RetriEval.Core.IEvalObserver.OnRunCompleted(RetriEval.Core.EvalReport)">
+            <summary>Called once after all cases have been evaluated.</summary>
+        </member>
+        <member name="T:RetriEval.Core.NullEvalObserver">
+            <summary>No-op observer. Used when no observer is configured.</summary>
+        </member>
+        <member name="F:RetriEval.Core.NullEvalObserver.Instance">
+            <summary>Singleton instance.</summary>
+        </member>
+        <member name="M:RetriEval.Core.NullEvalObserver.OnCaseStarted(RetriEval.Core.GoldenCase)">
+            <inheritdoc />
+        </member>
+        <member name="M:RetriEval.Core.NullEvalObserver.OnCaseCompleted(RetriEval.Core.QueryResult)">
+            <inheritdoc />
+        </member>
+        <member name="M:RetriEval.Core.NullEvalObserver.OnRunCompleted(RetriEval.Core.EvalReport)">
+            <inheritdoc />
+        </member>
+        <member name="T:RetriEval.Core.ConsoleEvalObserver">
+            <summary>
+            Writes a one-line progress update to <see cref="P:System.Console.Out"/> for each completed case.
+            </summary>
+        </member>
+        <member name="M:RetriEval.Core.ConsoleEvalObserver.OnCaseStarted(RetriEval.Core.GoldenCase)">
+            <inheritdoc />
+        </member>
+        <member name="M:RetriEval.Core.ConsoleEvalObserver.OnCaseCompleted(RetriEval.Core.QueryResult)">
+            <inheritdoc />
+        </member>
+        <member name="M:RetriEval.Core.ConsoleEvalObserver.OnRunCompleted(RetriEval.Core.EvalReport)">
+            <inheritdoc />
+        </member>
+        <member name="T:RetriEval.Core.QueryMetrics">
+            <summary>
+            All metric values computed for a single golden case.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.HitAtK">
+            <summary>Hit@k: 1.0 if any relevant chunk appears in the top-k results, else 0.0.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.PrecisionAtK">
+            <summary>Precision at cut-off k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.RecallAtK">
+            <summary>
+            Recall at cut-off k, measured against the hand-labeled relevant set.
+            See <see cref="M:RetriEval.Core.RetrievalMetrics.RecallAtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32,System.Int32)"/> for the known-item caveat.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.ReciprocalRank">
+            <summary>Reciprocal Rank: 1/rank of first relevant result, or 0.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.AveragePrecision">
+            <summary>Average Precision.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.NdcgAtK">
+            <summary>Normalized Discounted Cumulative Gain at cut-off k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.F1AtK">
+            <summary>Harmonic mean of Precision@k and Recall@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryMetrics.K">
+            <summary>The k value used for all cut-off metrics.</summary>
+        </member>
+        <member name="T:RetriEval.Core.QueryResult">
+            <summary>
+            Evaluation result for a single golden case, including retrieved chunks, per-chunk relevance,
+            per-query metrics, and any error that occurred.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.CaseId">
+            <summary>ID of the golden case this result corresponds to.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Query">
+            <summary>The query string used.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Retrieved">
+            <summary>Chunks returned by the retriever in rank order.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Relevance">
+            <summary>
+            Per-chunk relevance flags in the same order as <see cref="P:RetriEval.Core.QueryResult.Retrieved"/>.
+            <see langword="true"/> means the chunk was judged relevant by the <see cref="T:RetriEval.Core.IGrader"/>.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Gains">
+            <summary>Per-chunk gain values (used for NDCG).</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Metrics">
+            <summary>Computed metrics for this query.</summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Error">
+            <summary>
+            Non-null when an exception was thrown during retrieval.
+            Errored results are still included in the report; their metrics are zero.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.QueryResult.Category">
+            <summary>Category from the golden case, for grouping.</summary>
+        </member>
+        <member name="T:RetriEval.Core.ChunkIdGrader">
+            <summary>
+            Grades relevance by exact chunk-id membership.
+            </summary>
+            <remarks>
+            This is the strictest and most trustworthy grader — a chunk is relevant iff its
+            <see cref="P:RetriEval.Core.RetrievedChunk.Id"/> appears in <see cref="P:RetriEval.Core.GoldenCase.RelevantChunkIds"/>.
+            Requires stable, corpus-invariant chunk ids; re-chunking a document will invalidate the golden set.
+            When <see cref="P:RetriEval.Core.GoldenCase.GradedRelevance"/> is provided, <see cref="M:RetriEval.Core.ChunkIdGrader.Gain(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)"/> returns the mapped value.
+            </remarks>
+        </member>
+        <member name="F:RetriEval.Core.ChunkIdGrader.Instance">
+            <summary>Singleton instance — the grader is stateless.</summary>
+        </member>
+        <member name="M:RetriEval.Core.ChunkIdGrader.IsRelevant(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)">
+            <inheritdoc />
+        </member>
+        <member name="M:RetriEval.Core.ChunkIdGrader.Gain(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)">
+            <inheritdoc />
+        </member>
+        <member name="T:RetriEval.Core.IGrader">
+            <summary>
+            Decides whether a retrieved chunk satisfies a golden case.
+            Implement this to plug in custom relevance logic (e.g. semantic similarity, LLM judge).
+            </summary>
+            <remarks>
+            Implementations must be pure and thread-safe — <see cref="T:RetriEval.Core.EvalRunner"/> may call
+            them concurrently across multiple cases.
+            </remarks>
+        </member>
+        <member name="M:RetriEval.Core.IGrader.IsRelevant(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)">
+            <summary>Returns <see langword="true"/> when <paramref name="chunk"/> is relevant to <paramref name="case"/>.</summary>
+        </member>
+        <member name="M:RetriEval.Core.IGrader.Gain(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)">
+            <summary>
+            Returns the relevance gain for <paramref name="chunk"/> (used by NDCG).
+            Defaults to binary: 1 if relevant, 0 otherwise.
+            Override to supply graded gains from <see cref="P:RetriEval.Core.GoldenCase.GradedRelevance"/>.
+            </summary>
+        </member>
+        <member name="T:RetriEval.Core.KeywordGrader">
+            <summary>
+            Grades relevance by keyword presence in chunk content.
+            </summary>
+            <remarks>
+            A chunk is relevant iff its <see cref="P:RetriEval.Core.RetrievedChunk.Content"/> contains at least one keyword
+            from <see cref="P:RetriEval.Core.GoldenCase.RelevantKeywords"/>. Matching is case-insensitive ordinal.
+            <para>
+            This grader is more resilient to re-chunking than <see cref="T:RetriEval.Core.ChunkIdGrader"/> but is fuzzier —
+            a keyword match does not guarantee semantic relevance. Use when chunk ids are unstable or absent.
+            </para>
+            </remarks>
+        </member>
+        <member name="F:RetriEval.Core.KeywordGrader.Instance">
+            <summary>Singleton instance — the grader is stateless.</summary>
+        </member>
+        <member name="M:RetriEval.Core.KeywordGrader.IsRelevant(RetriEval.Core.RetrievedChunk,RetriEval.Core.GoldenCase)">
+            <inheritdoc />
+        </member>
+        <member name="T:RetriEval.Core.RetrievalMetrics">
+            <summary>
+            Pure, deterministic retrieval evaluation metrics.
+            All methods are stateless and operate on simple value types so they can be unit-tested
+            independently of any retriever or grader.
+            </summary>
+            <remarks>
+            Rounding is intentionally absent from these methods. Round only at the display/report boundary.
+            All metrics return values in [0, 1] unless otherwise noted.
+            </remarks>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.HitAtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32)">
+            <summary>
+            Returns 1.0 if at least one relevant item appears in the top-<paramref name="k"/> results, else 0.0.
+            </summary>
+            <param name="relevance">
+            Boolean relevance flags in rank order (index 0 = rank 1). Must not be empty.
+            </param>
+            <param name="k">Cut-off rank. Clamped to <c>[1, relevance.Count]</c>.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.PrecisionAtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32)">
+            <summary>
+            Returns the fraction of the top-<paramref name="k"/> results that are relevant.
+            </summary>
+            <param name="relevance">Boolean relevance flags in rank order.</param>
+            <param name="k">Cut-off rank. Clamped to <c>[1, relevance.Count]</c>.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.RecallAtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32,System.Int32)">
+            <summary>
+            Returns the fraction of the known-relevant set that appears in the top-<paramref name="k"/> results.
+            </summary>
+            <param name="relevance">Boolean relevance flags in rank order.</param>
+            <param name="k">Cut-off rank. Clamped to <c>[1, relevance.Count]</c>.</param>
+            <param name="totalRelevant">
+            Total number of relevant items in the golden case (the denominator).
+            Must be ≥ 1.
+            </param>
+            <remarks>
+            <b>Known-item recall caveat:</b> this measures recall against the <em>hand-labeled</em>
+            relevant set, not against the entire corpus. The corpus may contain unlabeled relevant
+            chunks that this metric cannot detect. Treat Recall@k as a lower bound.
+            </remarks>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.ReciprocalRank(System.Collections.Generic.IReadOnlyList{System.Boolean})">
+            <summary>
+            Returns the reciprocal of the rank of the first relevant result (1/rank), or 0 if none found.
+            Aggregate over a query set = <b>Mean Reciprocal Rank (MRR)</b>.
+            </summary>
+            <param name="relevance">Boolean relevance flags in rank order.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.AveragePrecision(System.Collections.Generic.IReadOnlyList{System.Boolean})">
+            <summary>
+            Returns the Average Precision: mean of Precision@i at each rank i where a relevant item appears.
+            Returns 0 when no relevant item is found. Aggregate over a query set = <b>MAP</b>.
+            </summary>
+            <param name="relevance">Boolean relevance flags in rank order.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.NdcgAtK(System.Collections.Generic.IReadOnlyList{System.Int32},System.Int32)">
+            <summary>
+            Returns the Normalized Discounted Cumulative Gain at cut-off <paramref name="k"/>.
+            Supports both binary gains (0/1) and graded gains (any non-negative integer).
+            Returns 0 when the ideal DCG is 0 (no relevant items).
+            </summary>
+            <param name="gains">
+            Per-rank gain values in rank order (index 0 = rank 1, gain ≥ 0).
+            Binary relevance: pass 1 for relevant, 0 for not relevant.
+            </param>
+            <param name="k">Cut-off rank. Clamped to <c>[1, gains.Count]</c>.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.F1AtK(System.Collections.Generic.IReadOnlyList{System.Boolean},System.Int32,System.Int32)">
+            <summary>
+            Returns the harmonic mean of Precision@k and Recall@k.
+            Returns 0 when both precision and recall are 0.
+            </summary>
+            <param name="relevance">Boolean relevance flags in rank order.</param>
+            <param name="k">Cut-off rank. Clamped to <c>[1, relevance.Count]</c>.</param>
+            <param name="totalRelevant">Total known-relevant items. Must be ≥ 1.</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievalMetrics.Mean(System.Collections.Generic.IReadOnlyList{System.Double})">
+            <summary>Computes the arithmetic mean of a sequence of per-query metric values.</summary>
+            <param name="values">Per-query metric values (e.g. one RR per query).</param>
+            <returns>Mean value, or <see cref="F:System.Double.NaN"/> when <paramref name="values"/> is empty.</returns>
+        </member>
+        <member name="T:RetriEval.Core.GoldenCase">
+            <summary>
+            A single hand-labeled evaluation case pairing a query with its known-relevant chunks.
+            </summary>
+            <remarks>
+            Ground truth can be expressed three ways (combinable):
+            <list type="bullet">
+              <item><see cref="P:RetriEval.Core.GoldenCase.RelevantChunkIds"/> — strict id-based match. Most trustworthy; requires stable ids.</item>
+              <item><see cref="P:RetriEval.Core.GoldenCase.RelevantKeywords"/> — chunk content must contain at least one keyword. Survives re-chunking.</item>
+              <item><see cref="P:RetriEval.Core.GoldenCase.GradedRelevance"/> — per-chunk gain scores for NDCG; falls back to binary when absent.</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.Id">
+            <summary>Unique identifier for this evaluation case (used in reports and regression diffs).</summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.Query">
+            <summary>The natural-language query sent to the retriever.</summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.RelevantChunkIds">
+            <summary>IDs of chunks considered relevant. An empty list means id-based matching is not used.</summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.RelevantKeywords">
+            <summary>
+            Keywords that, when present in a chunk's content, mark that chunk as relevant.
+            Matching is case-insensitive ordinal. An empty list means keyword matching is not used.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.GradedRelevance">
+            <summary>
+            Optional per-chunk graded relevance (chunk id → gain value ≥ 0) for NDCG calculations.
+            When <see langword="null"/>, binary gains (0 or 1) are used.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.Category">
+            <summary>Optional category tag for grouping results in reports.</summary>
+        </member>
+        <member name="P:RetriEval.Core.GoldenCase.Description">
+            <summary>Optional human-readable description of what this case tests.</summary>
+        </member>
+        <member name="T:RetriEval.Core.RetrievedChunk">
+            <summary>
+            A single chunk returned by a retriever, in descending relevance-rank order.
+            All properties are immutable; create via the primary constructor or <c>with</c> expressions.
+            </summary>
+            <param name="Id">Stable identifier that must uniquely address the chunk within the corpus.</param>
+            <param name="Content">The raw text of the chunk.</param>
+            <param name="Score">Retriever-assigned relevance score (higher = more relevant). Scale is retriever-specific.</param>
+            <param name="Metadata">Optional bag of string metadata (e.g. source document, page number).</param>
+        </member>
+        <member name="M:RetriEval.Core.RetrievedChunk.#ctor(System.String,System.String,System.Double,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
+            <summary>
+            A single chunk returned by a retriever, in descending relevance-rank order.
+            All properties are immutable; create via the primary constructor or <c>with</c> expressions.
+            </summary>
+            <param name="Id">Stable identifier that must uniquely address the chunk within the corpus.</param>
+            <param name="Content">The raw text of the chunk.</param>
+            <param name="Score">Retriever-assigned relevance score (higher = more relevant). Scale is retriever-specific.</param>
+            <param name="Metadata">Optional bag of string metadata (e.g. source document, page number).</param>
+        </member>
+        <member name="P:RetriEval.Core.RetrievedChunk.Id">
+            <summary>Stable identifier that must uniquely address the chunk within the corpus.</summary>
+        </member>
+        <member name="P:RetriEval.Core.RetrievedChunk.Content">
+            <summary>The raw text of the chunk.</summary>
+        </member>
+        <member name="P:RetriEval.Core.RetrievedChunk.Score">
+            <summary>Retriever-assigned relevance score (higher = more relevant). Scale is retriever-specific.</summary>
+        </member>
+        <member name="P:RetriEval.Core.RetrievedChunk.Metadata">
+            <summary>Optional bag of string metadata (e.g. source document, page number).</summary>
+        </member>
+        <member name="T:RetriEval.Core.MarkdownReporter">
+            <summary>
+            Renders an <see cref="T:RetriEval.Core.EvalReport"/> as a GitHub-flavored Markdown document.
+            Suitable as a CI artifact (e.g. appended to a pull-request comment or uploaded as a build artifact).
+            </summary>
+        </member>
+        <member name="M:RetriEval.Core.MarkdownReporter.#ctor(RetriEval.Core.MarkdownReporterOptions)">
+            <param name="options">Display options. Defaults applied when <see langword="null"/>.</param>
+        </member>
+        <member name="M:RetriEval.Core.MarkdownReporter.Render(RetriEval.Core.EvalReport)">
+            <summary>Renders the report to a Markdown string.</summary>
+        </member>
+        <member name="M:RetriEval.Core.MarkdownReporter.WriteAsync(RetriEval.Core.EvalReport,System.String,System.Threading.CancellationToken)">
+            <summary>Writes the report to <paramref name="path"/>, creating or overwriting the file.</summary>
+        </member>
+        <member name="T:RetriEval.Core.MarkdownReporterOptions">
+            <summary>Display options for <see cref="T:RetriEval.Core.MarkdownReporter"/>.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MarkdownReporterOptions.Thresholds">
+            <summary>Optional thresholds used to compute pass/fail in the summary table.</summary>
+        </member>
+        <member name="T:RetriEval.Core.MetricThresholds">
+            <summary>
+            Pass/fail thresholds for each metric. Set a property to <see langword="null"/> to omit the threshold column for that metric.
+            </summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.HitAtK">
+            <summary>Minimum acceptable Hit@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.PrecisionAtK">
+            <summary>Minimum acceptable mean Precision@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.RecallAtK">
+            <summary>Minimum acceptable mean Recall@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.Mrr">
+            <summary>Minimum acceptable MRR.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.Map">
+            <summary>Minimum acceptable MAP.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.NdcgAtK">
+            <summary>Minimum acceptable mean NDCG@k.</summary>
+        </member>
+        <member name="P:RetriEval.Core.MetricThresholds.F1AtK">
+            <summary>Minimum acceptable mean F1@k.</summary>
+        </member>
+        <member name="T:RetriEval.Core.InMemoryRetriever">
+            <summary>
+            A deterministic in-memory retriever for tests and samples.
+            Scores chunks by counting how many query words appear in the content (TF-style),
+            breaking ties by insertion order. No external dependencies, no randomness.
+            </summary>
+            <remarks>
+            This is not a production retriever — it is intentionally simple so that samples and
+            unit tests run without any external services. Use a real adapter (AzureAISearch, Qdrant, …)
+            for production evaluation.
+            </remarks>
+        </member>
+        <member name="M:RetriEval.Core.InMemoryRetriever.#ctor(System.Collections.Generic.IEnumerable{RetriEval.Core.RetrievedChunk})">
+            <param name="chunks">The full set of chunks to search over. Order determines tie-breaking.</param>
+        </member>
+        <member name="M:RetriEval.Core.InMemoryRetriever.RetrieveAsync(System.String,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:RetriEval.Core.IRetriever">
+            <summary>
+            The system under test. Returns chunks ranked by descending relevance to the given query.
+            </summary>
+            <remarks>
+            Implement this interface once to plug any retrieval backend into the evaluation harness.
+            Implementations should be thread-safe: <see cref="T:RetriEval.Core.EvalRunner"/> may call
+            <see cref="M:RetriEval.Core.IRetriever.RetrieveAsync(System.String,System.Int32,System.Threading.CancellationToken)"/> concurrently across multiple golden cases.
+            </remarks>
+        </member>
+        <member name="M:RetriEval.Core.IRetriever.RetrieveAsync(System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the top-<paramref name="k"/> chunks most relevant to <paramref name="query"/>.
+            Results must be ordered by descending score (most relevant first).
+            </summary>
+            <param name="query">The natural-language query.</param>
+            <param name="k">Maximum number of results to return.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>
+            A list of at most <paramref name="k"/> chunks in descending score order.
+            May return fewer than <paramref name="k"/> items if the corpus is smaller.
+            </returns>
+        </member>
+    </members>
+</doc>

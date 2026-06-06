@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-test:
+    name: Build, Test & Sample
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for Source Link
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (warnings-as-errors)
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test (unit tests, excludes live adapter tests)
+        run: >
+          dotnet test --no-build --configuration Release
+          --filter "Category!=Live"
+          --logger "trx;LogFileName=test-results.trx"
+          --logger "console;verbosity=minimal"
+
+      - name: Run sample (zero-dependency smoke test)
+        run: dotnet run --project samples/RetriEval.Sample --configuration Release
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/*.trx"
+
+      - name: Upload markdown report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: retrieval-report
+          path: "retrieval-report.md"
+
+  pack:
+    name: Pack NuGet
+    runs-on: ubuntu-latest
+    needs: build-test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Pack
+        run: dotnet pack src/RetriEval.Core --configuration Release --no-build --output ./artifacts
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./artifacts/*.nupkg

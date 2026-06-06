@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/RetriEval.Core/RetriEval.Core.csproj" />
+  <Project Path="tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj" />
+  <Project Path="samples/RetriEval.Sample/RetriEval.Sample.csproj" />
+</Solution>

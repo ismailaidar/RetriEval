@@ -1,0 +1,13 @@
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.AssemblyInfoInputs.cache
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.AssemblyInfo.cs
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.csproj.CoreCompileInputs.cache
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.xml
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/bin/Debug/net8.0/RetriEval.Core.deps.json
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/bin/Debug/net8.0/RetriEval.Core.dll
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/bin/Debug/net8.0/RetriEval.Core.pdb
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/bin/Debug/net8.0/RetriEval.Core.xml
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.dll
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/refint/RetriEval.Core.dll
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/RetriEval.Core.pdb
+/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/Debug/net8.0/ref/RetriEval.Core.dll

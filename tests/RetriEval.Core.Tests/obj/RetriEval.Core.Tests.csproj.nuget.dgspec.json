@@ -1,0 +1,184 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj": {}
+  },
+  "projects": {
+    "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj": {
+      "version": "0.1.0",
+      "restore": {
+        "projectUniqueName": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj",
+        "projectName": "RetriEval.Core",
+        "projectPath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj",
+        "packagesPath": "/Users/ismailaidar/.nuget/packages/",
+        "outputPath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ismailaidar/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.SourceLink.GitHub": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj": {
+      "version": "0.1.0",
+      "restore": {
+        "projectUniqueName": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj",
+        "projectName": "RetriEval.Core.Tests",
+        "projectPath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj",
+        "packagesPath": "/Users/ismailaidar/.nuget/packages/",
+        "outputPath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/tests/RetriEval.Core.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ismailaidar/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj": {
+                "projectPath": "/Users/ismailaidar/Desktop/projects/nugets/RetriEval/src/RetriEval.Core/RetriEval.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.8.0, )"
+            },
+            "Microsoft.SourceLink.GitHub": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.5.3, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.5.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.26, 8.0.26]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
