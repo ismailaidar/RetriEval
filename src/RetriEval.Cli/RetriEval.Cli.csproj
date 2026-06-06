@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackageId>RetriEval.Cli</PackageId>
+    <ToolCommandName>retrieval-eval</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
+    <Description>CLI tool for RetriEval: init, run, compare, and generate retrieval evaluation golden sets.</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <ProjectReference Include="..\RetriEval.Reporting\RetriEval.Reporting.csproj" />
+    <ProjectReference Include="..\RetriEval.Llm.Abstractions\RetriEval.Llm.Abstractions.csproj" />
+    <!-- System.CommandLine for argument parsing — build-time only for the tool -->
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+</Project>

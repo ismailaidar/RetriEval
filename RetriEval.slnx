@@ -7,6 +7,10 @@
   <Project Path="src/RetriEval.Testing.Xunit/RetriEval.Testing.Xunit.csproj" />
   <Project Path="src/RetriEval.Testing.NUnit/RetriEval.Testing.NUnit.csproj" />
 
+  <!-- M4: LLM abstractions + CLI -->
+  <Project Path="src/RetriEval.Llm.Abstractions/RetriEval.Llm.Abstractions.csproj" />
+  <Project Path="src/RetriEval.Cli/RetriEval.Cli.csproj" />
+
   <!-- M3: Embeddings + adapters -->
   <Project Path="src/RetriEval.Embeddings.Abstractions/RetriEval.Embeddings.Abstractions.csproj" />
   <Project Path="src/RetriEval.Adapters.AzureAISearch/RetriEval.Adapters.AzureAISearch.csproj" />

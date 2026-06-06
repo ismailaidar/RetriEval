@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Llm.Abstractions</PackageId>
+    <Description>ILlmClient abstraction, LlmJudgeGrader, and synthetic golden-set generator for RetriEval. Non-deterministic and requires an LLM API — use as a supplement to hand labels, never as a replacement.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+  </ItemGroup>
+
+</Project>
