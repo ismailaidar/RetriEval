@@ -7,9 +7,15 @@
   <Project Path="src/RetriEval.Testing.Xunit/RetriEval.Testing.Xunit.csproj" />
   <Project Path="src/RetriEval.Testing.NUnit/RetriEval.Testing.NUnit.csproj" />
 
+  <!-- M3: Embeddings + adapters -->
+  <Project Path="src/RetriEval.Embeddings.Abstractions/RetriEval.Embeddings.Abstractions.csproj" />
+  <Project Path="src/RetriEval.Adapters.AzureAISearch/RetriEval.Adapters.AzureAISearch.csproj" />
+  <Project Path="src/RetriEval.Adapters.Qdrant/RetriEval.Adapters.Qdrant.csproj" />
+
   <!-- Tests -->
   <Project Path="tests/RetriEval.Core.Tests/RetriEval.Core.Tests.csproj" />
   <Project Path="tests/RetriEval.Reporting.Tests/RetriEval.Reporting.Tests.csproj" />
+  <Project Path="tests/RetriEval.Adapters.Tests/RetriEval.Adapters.Tests.csproj" />
   <!-- Sample -->
   <Project Path="samples/RetriEval.Sample/RetriEval.Sample.csproj" />
 </Solution>

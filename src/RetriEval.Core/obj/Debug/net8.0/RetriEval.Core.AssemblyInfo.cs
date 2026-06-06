@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute(("Deterministic, CI-friendly retrieval evaluation for RAG systems. Metrics: Hit@k, " +
     "MRR, MAP, NDCG, Precision, Recall, F1. Zero cloud dependencies."))]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+653027e0d2baf331d86d829675f793a7bff74527")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+e4de790046e45287298ebc8bc81a2e1693efc0cb")]
 [assembly: System.Reflection.AssemblyProductAttribute("RetriEval")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RetriEval.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.0.0")]

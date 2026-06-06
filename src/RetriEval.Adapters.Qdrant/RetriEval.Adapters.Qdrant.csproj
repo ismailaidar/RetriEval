@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Adapters.Qdrant</PackageId>
+    <Description>IRetriever adapter for Qdrant vector store for the RetriEval evaluation harness.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <PackageReference Include="Qdrant.Client" Version="1.10.0" />
+  </ItemGroup>
+
+</Project>

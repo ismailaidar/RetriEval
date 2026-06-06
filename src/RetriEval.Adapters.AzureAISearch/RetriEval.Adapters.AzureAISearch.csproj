@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Adapters.AzureAISearch</PackageId>
+    <Description>IRetriever adapter for Azure AI Search (vector and hybrid search) for the RetriEval evaluation harness.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
+  </ItemGroup>
+
+</Project>

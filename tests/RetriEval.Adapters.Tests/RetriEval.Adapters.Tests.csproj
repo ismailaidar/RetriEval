@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="xunit.SkippableFact" Version="1.4.13" />
+    <!-- Needed directly because ProjectReference transitive packages are not auto-visible -->
+    <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
+    <PackageReference Include="Qdrant.Client" Version="1.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RetriEval.Adapters.AzureAISearch\RetriEval.Adapters.AzureAISearch.csproj" />
+    <ProjectReference Include="..\..\src\RetriEval.Adapters.Qdrant\RetriEval.Adapters.Qdrant.csproj" />
+    <ProjectReference Include="..\..\src\RetriEval.Embeddings.Abstractions\RetriEval.Embeddings.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\RetriEval.Core\RetriEval.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

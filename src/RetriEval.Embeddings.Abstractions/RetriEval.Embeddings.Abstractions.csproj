@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Embeddings.Abstractions</PackageId>
+    <Description>IEmbedder abstraction and SemanticGrader for RetriEval — cosine-similarity relevance grading when chunk ids are unstable.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+  </ItemGroup>
+
+</Project>
