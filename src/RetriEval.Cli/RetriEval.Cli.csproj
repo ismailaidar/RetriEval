@@ -8,6 +8,8 @@
     <Description>CLI tool for RetriEval: init, run, compare, and generate retrieval evaluation golden sets.</Description>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoWarn>CS1591</NoWarn>
+    <!-- Tool packages can't embed a README the same way library packages do -->
+    <PackageReadmeFile></PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
