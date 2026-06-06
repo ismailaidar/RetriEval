@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RetriEval.Observability</PackageId>
+    <Description>OpenTelemetry IEvalObserver for RetriEval — exports per-query and aggregate retrieval metrics as OTel instruments.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetriEval.Core\RetriEval.Core.csproj" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+    <PackageReference Include="OpenTelemetry" Version="1.9.0" />
+  </ItemGroup>
+
+</Project>

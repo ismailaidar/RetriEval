@@ -9,7 +9,8 @@
     <RepositoryUrl>https://github.com/retri-eval/RetriEval</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>rag;retrieval;evaluation;ndcg;mrr;nlp;ai</PackageTags>
+    <PackageTags>rag;retrieval;evaluation;ndcg;mrr;nlp;ai;llm</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
     <!-- Build hygiene -->
     <Nullable>enable</Nullable>
@@ -17,18 +18,28 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>12</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
+
+    <!-- Deterministic + Source Link (debuggable NuGet packages) -->
     <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
-    <!-- Versioning -->
+    <!-- Versioning — override per-package or via CI environment variables -->
     <VersionPrefix>0.1.0</VersionPrefix>
   </PropertyGroup>
 
+  <!-- README.md and LICENSE are included in every package via the items below.
+       Each src project can override PackageReadmeFile to point at a package-specific readme. -->
+  <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(IsPackable)' != 'false' and '$(OutputType)' != 'Exe'">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE"   Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <ItemGroup>
-    <!-- Source Link for deterministic, debuggable NuGet packages -->
+    <!-- Source Link for deterministic, debuggable NuGet packages (build-time only) -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>
