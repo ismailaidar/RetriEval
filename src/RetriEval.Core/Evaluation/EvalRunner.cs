@@ -73,10 +73,23 @@ public sealed class EvalRunner
 
         var relevance = new bool[retrieved.Count];
         var gains = new int[retrieved.Count];
-        for (var i = 0; i < retrieved.Count; i++)
+
+        // Prefer the async path to avoid sync-over-async with LLM-backed graders.
+        if (_grader is IAsyncGrader asyncGrader)
         {
-            relevance[i] = _grader.IsRelevant(retrieved[i], goldenCase);
-            gains[i] = _grader.Gain(retrieved[i], goldenCase);
+            for (var i = 0; i < retrieved.Count; i++)
+            {
+                relevance[i] = await asyncGrader.IsRelevantAsync(retrieved[i], goldenCase, ct).ConfigureAwait(false);
+                gains[i]     = await asyncGrader.GainAsync(retrieved[i], goldenCase, ct).ConfigureAwait(false);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < retrieved.Count; i++)
+            {
+                relevance[i] = _grader.IsRelevant(retrieved[i], goldenCase);
+                gains[i]     = _grader.Gain(retrieved[i], goldenCase);
+            }
         }
 
         var totalRelevant = Math.Max(1, goldenCase.RelevantChunkIds.Count + goldenCase.RelevantKeywords.Count > 0

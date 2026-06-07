@@ -17,7 +17,7 @@ namespace RetriEval.Llm.Abstractions;
 /// <see cref="BuildPrompt"/> to customise the grading instruction.
 /// </para>
 /// </remarks>
-public class LlmJudgeGrader : IGrader
+public class LlmJudgeGrader : IAsyncGrader
 {
     private readonly ILlmClient _llm;
 

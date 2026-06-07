@@ -10,6 +10,15 @@ namespace RetriEval.Core;
 /// This grader is more resilient to re-chunking than <see cref="ChunkIdGrader"/> but is fuzzier —
 /// a keyword match does not guarantee semantic relevance. Use when chunk ids are unstable or absent.
 /// </para>
+/// <para>
+/// <b>Warning — keyword presence ≠ query relevance.</b>
+/// Consider a query "Does Humira require prior authorization?" with keyword "Humira".
+/// A chunk containing "Store Humira at 36–46 °F" would be graded relevant even though it does not
+/// answer the prior-authorization question. This false-positive problem grows with common or
+/// brand-name terms that appear in many unrelated chunks.
+/// For stronger relevance signals, use <see cref="ChunkIdGrader"/> (when IDs are stable)
+/// or <c>LlmJudgeGrader</c> (RetriEval.Llm.Abstractions) for semantic judgement.
+/// </para>
 /// </remarks>
 public sealed class KeywordGrader : IGrader
 {
