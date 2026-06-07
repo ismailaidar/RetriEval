@@ -5,8 +5,8 @@
     <Product>RetriEval</Product>
     <Copyright>Copyright © 2024 RetriEval Contributors</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/retri-eval/RetriEval</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/retri-eval/RetriEval</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ismailaidar/RetriEval</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ismailaidar/RetriEval</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>rag;retrieval;evaluation;ndcg;mrr;nlp;ai;llm</PackageTags>

@@ -5,7 +5,7 @@
 Score Hit@k, MRR, MAP, NDCG, Precision, Recall, and F1 against a hand-labeled golden set. Reproducible, free to run, and wirable into a CI gate — no cloud credentials required.
 
 [![NuGet](https://img.shields.io/nuget/v/RetriEval.Core)](https://www.nuget.org/packages/RetriEval.Core)
-[![CI](https://github.com/retri-eval/RetriEval/actions/workflows/ci.yml/badge.svg)](https://github.com/retri-eval/RetriEval/actions/workflows/ci.yml)
+[![CI](https://github.com/ismailaidar/RetriEval/actions/workflows/ci.yml/badge.svg)](https://github.com/ismailaidar/RetriEval/actions/workflows/ci.yml)
 
 ---
 
@@ -68,7 +68,7 @@ The Python RAG ecosystem (Ragas, DeepEval, TruLens) defaults to LLM-as-judge for
 - Requires credentials that make local dev painful
 - Is slow (seconds per query vs. microseconds)
 
-RetriEval takes the opposite position: **ground truth is a spreadsheet, not a prompt.** Hand-label 50–200 queries once, commit them to source control, and run the eval in under a second in every CI job — free, reproducible, and auditable. LLM-based grading (`LlmJudgeGrader`, M4) is available as an add-on when you need it, but is never required.
+RetriEval takes the opposite position: **ground truth is a spreadsheet, not a prompt.** Hand-label 50–200 queries once, commit them to source control, and run the eval in under a second in every CI job — free, reproducible, and auditable. LLM-based grading (`LlmJudgeGrader`, see below) is available as an add-on when you need it, but is never required.
 
 ---
 
@@ -143,15 +143,16 @@ var runner = new EvalRunner(retriever, grader);
 
 ```
 src/
-  RetriEval.Core/         # Metrics, models, runner, graders, reporters — zero runtime deps
-  RetriEval.Reporting/    # JSON + HTML reporters, regression comparer   (M2)
-  RetriEval.Testing.Xunit/  # xUnit assertion wrappers                   (M2)
-  RetriEval.Testing.NUnit/  # NUnit assertion wrappers                   (M2)
-  RetriEval.Embeddings.Abstractions/  # IEmbedder + SemanticGrader       (M3)
-  RetriEval.Llm.Abstractions/         # ILlmClient + LlmJudgeGrader      (M4)
-  RetriEval.Adapters.AzureAISearch/   # Azure AI Search adapter           (M3)
-  RetriEval.Adapters.Qdrant/          # Qdrant adapter                    (M3)
-  RetriEval.Cli/           # `retrieval-eval` dotnet tool                (M4)
+  RetriEval.Core/                     # Metrics, models, runner, graders, GoldenSetLoader — zero runtime deps
+  RetriEval.Reporting/                # JSON + HTML reporters, regression comparer
+  RetriEval.Testing.Xunit/            # xUnit assertion wrappers (RetrievalAssert)
+  RetriEval.Testing.NUnit/            # NUnit assertion wrappers (RetrievalAssert)
+  RetriEval.Embeddings.Abstractions/  # IEmbedder + SemanticGrader
+  RetriEval.Llm.Abstractions/         # ILlmClient + OpenAILlmClient + LlmJudgeGrader + GoldenSetGenerator
+  RetriEval.Adapters.AzureAISearch/   # Azure AI Search adapter (AzureAISearchRetriever)
+  RetriEval.Adapters.Qdrant/          # Qdrant adapter (QdrantRetriever)
+  RetriEval.Observability/            # OpenTelemetry IEvalObserver exporter
+  RetriEval.Cli/                      # `retrieval-eval` dotnet tool: init, run, compare, generate
 tests/
   RetriEval.Core.Tests/
   RetriEval.Reporting.Tests/
