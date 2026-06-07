@@ -8,9 +8,9 @@ namespace RetriEval.Core;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The format is a JSON array of <see cref="GoldenCase"/> objects. Property names are matched
-/// case-insensitively, so both <c>camelCase</c> (the convention used by <c>retrieval-eval init</c>)
-/// and <c>PascalCase</c> input is accepted:
+/// The format is a JSON array of <see cref="GoldenCase"/> objects. Property <em>casing</em> is
+/// matched case-insensitively, so both <c>camelCase</c> (the convention used by
+/// <c>retrieval-eval init</c>) and <c>PascalCase</c> input is accepted:
 /// <code>
 /// [
 ///   {
@@ -23,6 +23,16 @@ namespace RetriEval.Core;
 ///   }
 /// ]
 /// </code>
+/// </para>
+/// <para>
+/// <b>Pitfall — only casing is normalized, not separators.</b> <c>System.Text.Json</c>'s
+/// case-insensitive matching maps <c>relevantChunkIds</c> ↔ <c>RelevantChunkIds</c>, but
+/// <em>not</em> <c>relevant_chunk_ids</c> (snake_case) ↔ <c>RelevantChunkIds</c> — the
+/// underscore makes them different property names. A snake_case key silently fails to bind
+/// and the property keeps its empty-collection default, with no exception. <see cref="LoadAsync"/>
+/// detects this specific failure mode — a case left with no relevance signal at all — and
+/// throws <see cref="InvalidDataException"/> naming the offending case ids, rather than letting
+/// you debug a run that mysteriously scores zero across the board.
 /// </para>
 /// </remarks>
 public static class GoldenSetLoader
@@ -41,6 +51,13 @@ public static class GoldenSetLoader
     /// <returns>The parsed cases, or an empty list when the file contains <c>null</c> or an empty array.</returns>
     /// <exception cref="FileNotFoundException">No file exists at <paramref name="path"/>.</exception>
     /// <exception cref="JsonException">The file does not contain a valid JSON array of golden cases.</exception>
+    /// <exception cref="InvalidDataException">
+    /// One or more cases deserialized with <em>no</em> relevance signal — empty
+    /// <see cref="GoldenCase.RelevantChunkIds"/>, <see cref="GoldenCase.RelevantKeywords"/>,
+    /// and <see cref="GoldenCase.GradedRelevance"/>. Such a case can never score above zero,
+    /// and the most common cause is a property-name casing mismatch (e.g. snake_case JSON
+    /// keys) that deserialized silently rather than throwing. See <b>Pitfall</b> above.
+    /// </exception>
     public static async Task<IReadOnlyList<GoldenCase>> LoadAsync(string path, CancellationToken ct = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -49,8 +66,33 @@ public static class GoldenSetLoader
 
         await using var stream = File.OpenRead(path);
         var cases = await JsonSerializer.DeserializeAsync<List<GoldenCase>>(stream, Options, ct)
-            .ConfigureAwait(false);
-        return cases ?? [];
+            .ConfigureAwait(false) ?? [];
+
+        ThrowIfAnyCaseHasNoRelevanceSignal(cases, path);
+        return cases;
+    }
+
+    private static void ThrowIfAnyCaseHasNoRelevanceSignal(List<GoldenCase> cases, string path)
+    {
+        var unlabeled = cases.Where(c =>
+            c.RelevantChunkIds.Count == 0 &&
+            c.RelevantKeywords.Count == 0 &&
+            (c.GradedRelevance is null or { Count: 0 })
+        ).Select(c => c.Id).ToList();
+
+        if (unlabeled.Count == 0)
+            return;
+
+        throw new InvalidDataException(
+            $"'{path}' contains {unlabeled.Count} of {cases.Count} golden case(s) with no " +
+            $"relevance signal at all (RelevantChunkIds, RelevantKeywords, and GradedRelevance " +
+            $"are all empty): {string.Join(", ", unlabeled)}. " +
+            "Such cases can never score above zero. The most common cause is a JSON " +
+            "property-name mismatch — GoldenSetLoader expects camelCase keys " +
+            "(relevantChunkIds, relevantKeywords, gradedRelevance); keys in another " +
+            "convention such as snake_case (relevant_chunk_ids) deserialize silently to " +
+            "empty collections rather than throwing, because case-insensitive matching " +
+            "normalizes letter casing but not separators like underscores.");
     }
 
     /// <summary>

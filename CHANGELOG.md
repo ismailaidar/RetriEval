@@ -3,6 +3,18 @@
 All notable changes to RetriEval are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [SemVer](https://semver.org/).
 
+## [0.3.1] — 2026-06-06
+
+### Fixed
+- **`GoldenSetLoader.LoadAsync`** now throws `InvalidDataException` (naming the offending
+  case ids) when a golden case deserializes with *no* relevance signal at all — empty
+  `RelevantChunkIds`, `RelevantKeywords`, and `GradedRelevance`. Previously this failed
+  silently: `System.Text.Json`'s case-insensitive matching normalizes letter casing
+  (`relevantChunkIds` ↔ `RelevantChunkIds`) but not separators, so snake_case keys
+  (`relevant_chunk_ids`) bound to nothing and left the property at its empty-collection
+  default — producing a run that mysteriously scored zero across the board with no error.
+  Reported from real debugging time lost chasing a snake_case → camelCase mismatch.
+
 ## [0.3.0] — 2026-06-06
 
 ### Added
@@ -67,6 +79,7 @@ Initial release.
 - `OpenTelemetryEvalObserver` (`RetriEval.Observability`) — exports run/case metrics as
   OTel `Meter` instruments.
 
+[0.3.1]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.2.0
 [0.1.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.1.0

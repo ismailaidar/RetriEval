@@ -201,6 +201,15 @@ IReadOnlyList<GoldenCase> goldenSet = await GoldenSetLoader.LoadAsync("golden-se
 await GoldenSetLoader.SaveAsync(goldenSet, "golden-set.json");
 ```
 
+> **Pitfall — casing is normalized, separators are not.** `relevantChunkIds` and
+> `RelevantChunkIds` both bind correctly, but `relevant_chunk_ids` (snake_case) does **not** —
+> the underscore makes it a different property name, so it silently deserializes to an empty
+> collection instead of throwing. `LoadAsync` specifically detects cases left with *no*
+> relevance signal at all (empty `RelevantChunkIds`, `RelevantKeywords`, *and*
+> `GradedRelevance`) and throws `InvalidDataException` naming the offending case ids — so a
+> naming mismatch surfaces immediately instead of producing a run that mysteriously scores
+> zero across the board. Use camelCase keys to match `retrieval-eval init`'s output.
+
 ### Interfaces
 
 ```csharp

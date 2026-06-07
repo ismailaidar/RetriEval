@@ -13,6 +13,66 @@ public class GoldenSetLoaderTests
     }
 
     [Fact]
+    public async Task LoadAsync_SnakeCaseKeys_ThrowsInvalidDataExceptionNamingTheCase()
+    {
+        // snake_case keys silently fail to bind to RelevantChunkIds/RelevantKeywords —
+        // System.Text.Json's case-insensitive matching normalizes casing, not separators.
+        // The case ends up with no relevance signal at all; LoadAsync must catch this loudly.
+        var path = TempFile();
+        try
+        {
+            await File.WriteAllTextAsync(path, """
+                [
+                  {
+                    "id": "q-humira-pa",
+                    "query": "Does Humira require prior authorization?",
+                    "relevant_chunk_ids": ["chunk-pa-policy"],
+                    "relevant_keywords": ["Humira", "prior authorization"]
+                  }
+                ]
+                """);
+
+            var ex = await Assert.ThrowsAsync<InvalidDataException>(() => GoldenSetLoader.LoadAsync(path));
+
+            Assert.Contains("q-humira-pa", ex.Message);
+            Assert.Contains("camelCase", ex.Message);
+            Assert.Contains("snake_case", ex.Message);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task LoadAsync_CaseWithGradedRelevanceOnly_DoesNotThrow()
+    {
+        // GradedRelevance alone is a valid relevance signal — must not be flagged as "unlabeled".
+        var path = TempFile();
+        try
+        {
+            await File.WriteAllTextAsync(path, """
+                [
+                  {
+                    "id": "q-graded",
+                    "query": "What is the Eiffel Tower?",
+                    "gradedRelevance": { "chunk-eiffel-001": 2 }
+                  }
+                ]
+                """);
+
+            var cases = await GoldenSetLoader.LoadAsync(path);
+
+            var c = Assert.Single(cases);
+            Assert.Equal(2, c.GradedRelevance?["chunk-eiffel-001"]);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public async Task LoadAsync_CamelCaseJson_ParsesCaseInsensitively()
     {
         var path = TempFile();
