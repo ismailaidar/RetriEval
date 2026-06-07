@@ -3,6 +3,23 @@
 All notable changes to RetriEval are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [SemVer](https://semver.org/).
 
+## [0.3.0] — 2026-06-06
+
+### Added
+- **`GoldenSetLoader`** (`RetriEval.Core`) — `LoadAsync`/`SaveAsync` for the golden-set JSON
+  format used by the `retrieval-eval` CLI, samples, and docs. Matches the camelCase,
+  case-insensitive format produced by `retrieval-eval init`, removing the need for consumers
+  to hand-roll `JsonSerializer` calls and option setup.
+
+### Changed
+- `RetriEval.Cli`'s `run` command now loads golden sets via `GoldenSetLoader` instead of
+  inline `JsonSerializer` calls.
+
+### Fixed
+- `PackageProjectUrl`/`RepositoryUrl` in `Directory.Build.props` (and the README CI badge)
+  pointed at a stale `retri-eval/RetriEval` org instead of the actual repo,
+  `ismailaidar/RetriEval`. These URLs are embedded in every published package.
+
 ## [0.2.0] — 2026-06-06
 
 ### Added
@@ -50,5 +67,6 @@ Initial release.
 - `OpenTelemetryEvalObserver` (`RetriEval.Observability`) — exports run/case metrics as
   OTel `Meter` instruments.
 
+[0.3.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.2.0
 [0.1.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.1.0
