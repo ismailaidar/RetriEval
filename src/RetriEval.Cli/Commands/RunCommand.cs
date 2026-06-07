@@ -1,5 +1,4 @@
 using System.CommandLine;
-using System.Text.Json;
 using RetriEval.Core;
 using RetriEval.Reporting;
 
@@ -30,19 +29,16 @@ internal static class RunCommand
 
         cmd.SetHandler(async (string goldenSetPath, string outputBase, int k, string[] formats) =>
         {
-            if (!File.Exists(goldenSetPath))
+            IReadOnlyList<GoldenCase> cases;
+            try
+            {
+                cases = await GoldenSetLoader.LoadAsync(goldenSetPath);
+            }
+            catch (FileNotFoundException)
             {
                 Console.Error.WriteLine($"Golden set not found: {goldenSetPath}");
                 Environment.Exit(1);
                 return;
-            }
-
-            List<GoldenCase>? cases;
-            try
-            {
-                var json = await File.ReadAllTextAsync(goldenSetPath);
-                cases = JsonSerializer.Deserialize<List<GoldenCase>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             catch (Exception ex)
             {
@@ -51,7 +47,7 @@ internal static class RunCommand
                 return;
             }
 
-            if (cases is null or { Count: 0 })
+            if (cases.Count == 0)
             {
                 Console.Error.WriteLine("Golden set is empty.");
                 Environment.Exit(1);

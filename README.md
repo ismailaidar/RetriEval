@@ -192,6 +192,14 @@ record GoldenCase
 }
 ```
 
+Load and save golden sets without hand-rolling JSON (de)serialization — `GoldenSetLoader`
+matches the format produced by `retrieval-eval init` (camelCase, case-insensitive on read):
+
+```csharp
+IReadOnlyList<GoldenCase> goldenSet = await GoldenSetLoader.LoadAsync("golden-set.json");
+await GoldenSetLoader.SaveAsync(goldenSet, "golden-set.json");
+```
+
 ### Interfaces
 
 ```csharp
@@ -266,6 +274,11 @@ public async Task Retrieval_MeetsQualityBar()
 ```
 
 ---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for what changed in each release — useful for deciding
+when to adopt a new minor version versus pinning.
 
 ## License
 
