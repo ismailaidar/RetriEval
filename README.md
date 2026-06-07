@@ -100,10 +100,42 @@ A `IGrader` decides whether a retrieved chunk satisfies a golden case. Choose th
 |--------|-------------|-------------|
 | `ChunkIdGrader` | Exact match on `RetrievedChunk.Id` | Stable chunk ids (recommended) |
 | `KeywordGrader` | Chunk content contains any `RelevantKeyword` (case-insensitive) | Ids change after re-chunking |
-| `SemanticGrader` (M3) | Cosine similarity ≥ threshold via `IEmbedder` | Paraphrased chunks |
-| `LlmJudgeGrader` (M4) | LLM decides per-chunk relevance | Maximum recall, non-deterministic |
+| `SemanticGrader` | Cosine similarity ≥ threshold via `IEmbedder` | Paraphrased chunks |
+| `LlmJudgeGrader` | LLM decides per-chunk relevance | Maximum precision, non-deterministic |
+
+> **`KeywordGrader` caveat — keyword presence ≠ query relevance.**
+> A query "Does Humira require prior authorization?" with keyword `"Humira"` would mark a
+> chunk about storage temperature as relevant, because it contains the word. Use
+> `ChunkIdGrader` (stable ids) or `LlmJudgeGrader` (semantic judgement) when false positives matter.
 
 You can combine strategies: run `ChunkIdGrader` in CI (fast, deterministic), and spot-check with `LlmJudgeGrader` locally.
+
+### LLM-judge grading (0.2.0+)
+
+`RetriEval.Llm.Abstractions` ships `OpenAILlmClient` — a zero-extra-dependency implementation of `ILlmClient` that works with OpenAI, Azure OpenAI, Ollama, and any OpenAI-compatible endpoint:
+
+```csharp
+// dotnet add package RetriEval.Llm.Abstractions
+
+// OpenAI
+var llm = new OpenAILlmClient(apiKey: Environment.GetEnvironmentVariable("OPENAI_KEY")!);
+
+// Azure OpenAI (resource-key auth)
+var llm = new OpenAILlmClient(
+    apiKey: Environment.GetEnvironmentVariable("AZURE_OPENAI_KEY")!,
+    endpoint: "https://{resource}.openai.azure.com/openai/deployments/{deployment}" +
+              "/chat/completions?api-version=2024-02-01",
+    authHeaderName: "api-key");
+
+// Ollama (local, no key needed)
+var llm = new OpenAILlmClient(apiKey: "ollama", model: "llama3",
+    endpoint: "http://localhost:11434/v1/chat/completions");
+
+var grader = new LlmJudgeGrader(llm);
+var runner = new EvalRunner(retriever, grader);
+```
+
+`LlmJudgeGrader` implements `IAsyncGrader` — `EvalRunner` automatically uses the async path, so LLM calls are properly awaited with no sync-over-async overhead.
 
 ---
 
@@ -172,6 +204,14 @@ interface IGrader
 {
     bool IsRelevant(RetrievedChunk chunk, GoldenCase @case);
     int Gain(RetrievedChunk chunk, GoldenCase @case);   // for NDCG; defaults to binary
+}
+
+// Implement instead of IGrader when relevance judgement involves I/O (e.g. LLM calls).
+// EvalRunner detects IAsyncGrader and uses the async path automatically.
+interface IAsyncGrader : IGrader
+{
+    Task<bool> IsRelevantAsync(RetrievedChunk chunk, GoldenCase @case, CancellationToken ct);
+    Task<int>  GainAsync(RetrievedChunk chunk, GoldenCase @case, CancellationToken ct);
 }
 
 interface IEvalObserver
