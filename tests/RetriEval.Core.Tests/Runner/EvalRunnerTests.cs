@@ -132,6 +132,67 @@ public class EvalRunnerTests
     }
 
     // ---------------------------------------------------------------------------
+    // Recall@k / F1@k must stay within [0, 1] regardless of grading strategy
+    // (regression coverage for a bug where keyword-graded cases — which have no
+    // RelevantChunkIds to size the relevant set — produced Recall@k > 1.0 and,
+    // transitively, F1@k > 1.0; see CHANGELOG 0.3.2).
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public async Task Run_KeywordGradedCase_RecallAndF1StayWithinUnitRange()
+    {
+        var retriever = StaticRetriever([
+            new RetrievedChunk("c1", "Store Humira at 36-46 F", 0.9),
+            new RetrievedChunk("c2", "Humira requires prior authorization", 0.8),
+            new RetrievedChunk("c3", "Humira is an injectable biologic", 0.7)]);
+
+        var goldenCase = new GoldenCase
+        {
+            Id = "q-humira",
+            Query = "Does Humira require prior authorization?",
+            RelevantKeywords = ["Humira"],
+        };
+
+        var runner = new EvalRunner(retriever, KeywordGrader.Instance, new EvalOptions { K = 3 });
+        var report = await runner.RunAsync([goldenCase]);
+
+        var metrics = report.Results[0].Metrics;
+        Assert.InRange(metrics.RecallAtK, 0.0, 1.0);
+        Assert.InRange(metrics.F1AtK, 0.0, 1.0);
+
+        // All three retrieved chunks match the keyword, so the grader's own relevant set
+        // is {c1, c2, c3} — recall over that set is 1.0, not 3.0.
+        Assert.Equal(1.0, metrics.RecallAtK, 10);
+        Assert.Equal(1.0, metrics.F1AtK, 10);
+    }
+
+    [Fact]
+    public async Task Run_MixedGradingSignals_RecallAndF1NeverExceedOne()
+    {
+        var retriever = StaticRetriever([
+            new RetrievedChunk("a", "Humira dosage info", 1.0),
+            new RetrievedChunk("b", "Humira storage info", 0.9),
+            new RetrievedChunk("c", "Humira injection guide", 0.8)]);
+
+        var cases = new[]
+        {
+            new GoldenCase { Id = "ids-only",      Query = "query for ids-only",      RelevantChunkIds = ["a"] },
+            new GoldenCase { Id = "keywords-only", Query = "query for keywords-only", RelevantKeywords = ["Humira"] },
+            new GoldenCase { Id = "both",          Query = "query for both",          RelevantChunkIds = ["a"], RelevantKeywords = ["Humira"] },
+        };
+
+        var runner = new EvalRunner(retriever, KeywordGrader.Instance, new EvalOptions { K = 3 });
+        var report = await runner.RunAsync(cases);
+
+        foreach (var result in report.Results)
+        {
+            Assert.InRange(result.Metrics.RecallAtK, 0.0, 1.0);
+            Assert.InRange(result.Metrics.F1AtK, 0.0, 1.0);
+        }
+        Assert.InRange(report.Aggregate.MeanRecallAtK, 0.0, 1.0);
+    }
+
+    // ---------------------------------------------------------------------------
     // Cancellation
     // ---------------------------------------------------------------------------
 

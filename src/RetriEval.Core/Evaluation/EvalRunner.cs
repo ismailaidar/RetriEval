@@ -92,9 +92,15 @@ public sealed class EvalRunner
             }
         }
 
-        var totalRelevant = Math.Max(1, goldenCase.RelevantChunkIds.Count + goldenCase.RelevantKeywords.Count > 0
-            ? CountTotalRelevant(goldenCase)
-            : relevance.Count(r => r));
+        // The "true" relevant-set size is only known when RelevantChunkIds is populated.
+        // For keyword-graded (or otherwise unlabeled-by-id) cases, the grader's own verdicts
+        // are the only signal we have, so we fall back to the count of chunks it marked
+        // relevant. Taking the max of the two guarantees totalRelevant is never smaller than
+        // the number of relevant hits the grader can produce, which keeps RecallAtK — and
+        // F1AtK, which derives from it — within [0, 1] regardless of grading strategy.
+        var labeledRelevantCount = goldenCase.RelevantChunkIds.Count;
+        var observedRelevantCount = relevance.Count(r => r);
+        var totalRelevant = Math.Max(1, Math.Max(labeledRelevantCount, observedRelevantCount));
 
         var metrics = new QueryMetrics
         {
@@ -137,14 +143,6 @@ public sealed class EvalRunner
                 await Task.Delay(delay, ct).ConfigureAwait(false);
             }
         }
-    }
-
-    private static int CountTotalRelevant(GoldenCase goldenCase)
-    {
-        // For id-based grading, the relevant set size is the count of labeled relevant ids.
-        // For keyword grading, we cannot know corpus-wide relevant count — use the labeled id count as a proxy,
-        // or fall back to 1 so Recall stays in [0,1].
-        return Math.Max(1, goldenCase.RelevantChunkIds.Count);
     }
 
     private static QueryResult ErrorResult(GoldenCase goldenCase, int k, Exception ex)

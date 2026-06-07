@@ -3,6 +3,23 @@
 All notable changes to RetriEval are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [SemVer](https://semver.org/).
 
+## [0.3.2] — 2026-06-06
+
+### Fixed
+- **`EvalRunner`** no longer produces `Recall@k` (and transitively `F1@k`) values above
+  `1.0` for golden cases graded by keyword rather than by chunk id. The relevant-set size
+  fed to `RecallAtK` was sized from `RelevantChunkIds.Count` alone — `0` for keyword-only
+  cases — while `KeywordGrader` could mark several retrieved chunks relevant, producing
+  recall values like `3/1 = 3.0` and `F1@k = 1.5`. The relevant-set size is now the larger
+  of the labeled-id count and the number of chunks the grader actually marked relevant,
+  which keeps `Recall@k` and `F1@k` within `[0, 1]` for every grading strategy.
+- **`RetrievalMetrics.RecallAtK`** now throws `ArgumentOutOfRangeException` if `totalRelevant`
+  is smaller than the number of relevant items found in the top-k — an inconsistent input
+  that would otherwise silently produce a recall above `1.0`. This also guards `F1AtK`,
+  which derives its recall term from `RecallAtK`.
+- Reported with a reproduction showing per-query `R@3` values of `1, 0, 2, 3, 1, 0, 2, 1, 2, 3`
+  (mean `1.5`) and `F1@3 = 1.5` — both mathematically impossible for ratios bounded by `[0, 1]`.
+
 ## [0.3.1] — 2026-06-06
 
 ### Fixed
@@ -79,6 +96,7 @@ Initial release.
 - `OpenTelemetryEvalObserver` (`RetriEval.Observability`) — exports run/case metrics as
   OTel `Meter` instruments.
 
+[0.3.2]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.2
 [0.3.1]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ismailaidar/RetriEval/releases/tag/v0.2.0

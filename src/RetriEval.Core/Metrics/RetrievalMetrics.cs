@@ -83,6 +83,16 @@ public static class RetrievalMetrics
         {
             if (relevance[i]) hits++;
         }
+
+        // hits is a subset of the full relevant set, so totalRelevant — its size — can
+        // never be smaller. A caller passing a totalRelevant that undercounts the relevant
+        // set (e.g. sizing it from the wrong signal) would otherwise produce Recall@k > 1.0.
+        if (hits > totalRelevant)
+            throw new ArgumentOutOfRangeException(nameof(totalRelevant),
+                $"totalRelevant ({totalRelevant}) is smaller than the {hits} relevant item(s) " +
+                $"found in the top-{cut} alone — it must be at least that large, since those " +
+                "hits are a subset of the full relevant set. Recall@k would otherwise exceed 1.0.");
+
         return (double)hits / totalRelevant;
     }
 

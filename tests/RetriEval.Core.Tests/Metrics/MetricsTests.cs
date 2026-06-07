@@ -346,6 +346,37 @@ public class F1AtKTests
         var expected = 2 * p * r / (p + r);
         Assert.Equal(expected, RetrievalMetrics.F1AtK(rel, 3, 2), 10);
     }
+
+    [Fact]
+    public void F1AtK_IsInUnitInterval()
+    {
+        // F1 is the harmonic mean of two [0,1] ratios (Precision@k, Recall@k) and can
+        // therefore never exceed 1.0 for any *valid* totalRelevant — i.e. one no smaller
+        // than the relevant items actually present in `rel` (see CHANGELOG 0.3.2 for a
+        // real-world case where an inconsistent totalRelevant computed upstream let
+        // Recall@k — and so F1@k — exceed 1.0).
+        bool[] rel = [true, true, false];
+        for (var totalRelevant = 2; totalRelevant <= 4; totalRelevant++)
+        {
+            for (var k = 1; k <= 3; k++)
+            {
+                var f1 = RetrievalMetrics.F1AtK(rel, k, totalRelevant);
+                Assert.InRange(f1, 0.0, 1.0);
+            }
+        }
+    }
+
+    [Fact]
+    public void RecallAtK_TotalRelevantSmallerThanObservedHits_ThrowsArgumentOutOfRange()
+    {
+        // totalRelevant must be at least the number of relevant items found, since those
+        // hits are necessarily a subset of the full relevant set. A smaller totalRelevant
+        // is an inconsistent input that would silently produce Recall@k > 1.0 — guard
+        // against it loudly instead (see CHANGELOG 0.3.2).
+        bool[] rel = [true, true, true];
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => RetrievalMetrics.RecallAtK(rel, 3, 1));
+    }
 }
 
 public class MeanTests
